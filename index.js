@@ -1,60 +1,37 @@
-const express = require("express");
+const express = require('express');
+const mongoose = require('mongoose');
+const cors = require('cors');
 const app = express();
-const mongoose = require("mongoose");
-const dotenv = require("dotenv");
-const helmet = require("helmet");
-const morgan = require("morgan");
-const cors = require("cors");
-const multer = require("multer");
-const authRoute = require("./routes/auth");
-const userRoute = require("./routes/users");
-// const postRoute = require("./routes/posts");
-// const conversationRoute = require("./routes/conversations");
-// const messageRoute = require("./routes/messages");
-const router = express.Router();
-const path = require("path");
+require('dotenv').config();
+const cookieParser = require('cookie-parser');
+const pingRoute = require('./Routes/PingRoute');
+const authRoute = require('./Routes/AuthRoute');
+const userRoute = require('./Routes/UserRoute');
+const { MONGO_URL, PORT } = process.env;
 
-dotenv.config();
+mongoose
+    .connect(MONGO_URL, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+    })
+    .then(() => console.log('MongoDB is  connected successfully'))
+    .catch((err) => console.error(err));
 
-mongoose.connect(process.env.MONGO_URL, {useNewUrlParser:true, useUnifiedTopology:true}).then( () => {
-    console.log(`Mongodb connected!`);
-}).catch( (err) => {
-    console.log(err);
+app.listen(PORT, () => {
+    console.log(`Server is listening on port ${PORT}`);
 });
 
-app.use("/images", express.static(path.join(__dirname, "public/images")));
+app.use(
+    cors({
+        origin: ['http://localhost:3001'],
+        methods: ['GET', 'POST', 'PUT', 'DELETE'],
+        credentials: true,
+    })
+);
+app.use(cookieParser());
 
-//middleware
-app.use(cors());
-app.options('*', cors());
 app.use(express.json());
-app.use(helmet());
-app.use(morgan("common"));
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "public/images");
-  },
-  filename: (req, file, cb) => {
-    cb(null, req.body.name);
-  },
-});
-
-const upload = multer({ storage: storage });
-app.post("/api/upload", upload.single("file"), (req, res) => {
-  try {
-    return res.status(200).json("File uploded successfully");
-  } catch (error) {
-    console.error(error);
-  }
-});
-
-app.use("/api/auth", authRoute);
-app.use("/api/users", userRoute);
-// app.use("/api/posts", postRoute);
-// app.use("/api/conversations", conversationRoute);
-// app.use("/api/messages", messageRoute);
-
-app.listen(process.env.PORT, () => {
-  console.log(`Backend server is running at port: ${process.env.PORT}!`);
-});
+app.use('/api', pingRoute);
+app.use('/api', authRoute);
+app.use('/api/user', userRoute);
