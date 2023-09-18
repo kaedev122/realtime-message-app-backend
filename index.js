@@ -23,7 +23,7 @@ app.listen(PORT, () => {
 
 app.use(
     cors({
-        origin: ['http://localhost:3001'],
+        origin: ['https://realtime-message-app-backend.vercel.app'],
         methods: ['GET', 'POST', 'PUT', 'DELETE'],
         credentials: true,
     })
