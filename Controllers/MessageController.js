@@ -10,17 +10,11 @@ module.exports.createMessage = async (req, res) => {
     }
 };
 
-module.exports.getAllMessageFromConversation = async (req, res) => {
-    console.log(req.params.conversationId)
-    const messages = await Message.find({
-        conversationId: req.params.conversationId,
-    });
-    console.log("///////////////////////////////////", messages)
+module.exports.getAllMessage = async (req, res) => {
     try {
         const messages = await Message.find({
-            conversationId: req.params.conversationId,
+            conversationId: req.params.conversationId
         });
-        console.log("///////////////////////////////////", messages)
         res.status(200).json(messages);
     } catch (err) {
         res.status(500).json(err);
