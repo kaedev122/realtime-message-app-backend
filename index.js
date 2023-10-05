@@ -7,6 +7,8 @@ const cookieParser = require('cookie-parser');
 const pingRoute = require('./Routes/PingRoute');
 const authRoute = require('./Routes/AuthRoute');
 const userRoute = require('./Routes/UserRoute');
+const chatRoute = require('./Routes/ChatRoute');
+
 const { MONGO_URL, PORT } = process.env;
 
 mongoose
@@ -14,7 +16,7 @@ mongoose
         useNewUrlParser: true,
         useUnifiedTopology: true,
     })
-    .then(() => console.log('MongoDB is  connected successfully'))
+    .then(() => console.log('MongoDB is connected successfully'))
     .catch((err) => console.error(err));
 
 app.listen(PORT, () => {
@@ -33,5 +35,6 @@ app.use(cookieParser());
 app.use(express.json());
 
 app.use('/api', pingRoute);
-app.use('/api', authRoute);
+app.use('/api/auth', authRoute);
 app.use('/api/user', userRoute);
+app.use('/api/chat', chatRoute);

@@ -1,4 +1,4 @@
-const User = require('../Models/UserModel');
+const User = require("../Models/User.js");
 const { createSecretToken } = require('../Utils/SecretToken.js');
 const bcrypt = require('bcrypt');
 
@@ -71,7 +71,9 @@ module.exports.Login = async (req, res) => {
         await User.findByIdAndUpdate(user._id, {
             tokens: [...oldTokens, { token, signedAt: Date.now().toString() }],
         });
+
         const userInfo = {
+            _id: user._id,
             username: user.username,
             email: user.email,
             avatar: user.avatar ? user.avatar : '',
@@ -83,6 +85,7 @@ module.exports.Login = async (req, res) => {
             userInfo,
             token,
         });
+
     } catch (error) {
         console.error(error);
     }

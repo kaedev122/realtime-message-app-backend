@@ -1,8 +1,8 @@
-const User = require('../Models/UserModel');
+const User = require("../Models/User.js");
 const bcrypt = require('bcrypt');
 
 module.exports.UpdateProfile = async (req, res, next) => {
-    if (req.body.userId === req.params.id || req.body.isAdmin) {
+    if (req.user._id == req.params.id || req.body.isAdmin) {
         if (req.body.password) {
             try {
                 const salt = await bcrypt.genSalt(10);
@@ -34,4 +34,25 @@ module.exports.UpdateProfile = async (req, res, next) => {
             success: false,
         });
     };
+};
+
+module.exports.GetUserProfile = async (req, res) => {
+    if (req.user._id == req.params.id || req.body.isAdmin) {
+        try {
+            const user = await User.findById(req.params.id);
+            return res.status(200).json({
+                user,
+                success: true,
+            });
+        } catch (err) {
+            return res.status(500).json({
+                message: `Error: ${err}`,
+                success: false,
+            });
+        }
+    }
+    return res.status(500).json({
+        message: `Something was wrong!`,
+        success: false,
+    });
 };
