@@ -37,22 +37,20 @@ module.exports.UpdateProfile = async (req, res, next) => {
 };
 
 module.exports.GetUserProfile = async (req, res) => {
-    if (req.user._id == req.params.id || req.body.isAdmin) {
-        try {
-            const user = await User.findById(req.params.id);
-            return res.status(200).json({
-                user,
-                success: true,
-            });
-        } catch (err) {
-            return res.status(500).json({
-                message: `Error: ${err}`,
-                success: false,
-            });
-        }
+    if(req.user) {
+        return res.status(200).json({
+            user: {
+                _id: req.user._id,
+                username: req.user.username,
+                email: req.user.email,
+                profilePicture: req.user.profilePicture,
+                createdAt: req.user.createdAt
+            },
+            success: true,
+        });
     }
     return res.status(500).json({
-        message: `Something was wrong!`,
+        message: `Error!`,
         success: false,
     });
 };
