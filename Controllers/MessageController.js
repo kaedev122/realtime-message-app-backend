@@ -14,7 +14,9 @@ module.exports.getAllMessage = async (req, res) => {
     try {
         const messages = await Message.find({
             conversationId: req.params.conversationId
-        }).select("-updatedAt -__v");
+        })
+        .select("-updatedAt -__v")
+        .populate("sender", "_id username profilePicture")
         res.status(200).json(messages);
     } catch (err) {
         res.status(500).json(err);
