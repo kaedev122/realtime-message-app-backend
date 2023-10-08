@@ -5,7 +5,7 @@ const { userVerification } = require("../Middlewares/AuthMiddlewares");
 const router = require("express").Router();
 
 router.post("/c", userVerification, createConversation);
-router.get("/c/", userVerification, getAllConversation);
+router.get("/c", userVerification, getAllConversation);
 router.get("/c/:firstUserId/:secondUserId", userVerification, getOneConversation);
 
 router.post("/m", userVerification, createMessage);
