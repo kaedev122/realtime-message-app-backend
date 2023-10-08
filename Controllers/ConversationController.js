@@ -19,11 +19,12 @@ module.exports.createConversation =  async (req, res) => {
 
 module.exports.getAllConversation = async (req, res) => {
     try {
+        const user = await User.findById(req.user._id).select('_id username email profilePicture')
         const conversation = await Conversation.find({
-          members: { $in: [req.params.userId] },
+            members: { $in: [user] },
         });
         res.status(200).json(conversation);
-      } catch (err) {
+    } catch (err) {
         res.status(500).json(err);
     }
 };
