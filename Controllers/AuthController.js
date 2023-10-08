@@ -102,8 +102,8 @@ module.exports.Logout = async (req, res) => {
         }
 
         const tokens = req.user.tokens;
-
-        const newTokens = tokens.filter((t) => t.token !== token);
+        console.log(tokens)
+        const newTokens = tokens.filter((t) => t.token != token);
 
         await User.findByIdAndUpdate(req.user._id, { tokens: newTokens });
         res.json({ success: true, message: 'Sign out successfully!' });
