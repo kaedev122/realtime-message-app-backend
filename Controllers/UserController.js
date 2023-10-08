@@ -1,8 +1,9 @@
 const User = require("../Models/User.js");
+const Conversation = require("../Models/Conversation.js");
 const bcrypt = require('bcrypt');
 
-module.exports.UpdateProfile = async (req, res, next) => {
-    if (req.user._id == req.params.id || req.body.isAdmin) {
+module.exports.UpdateProfile = async (req, res) => {
+    if (req.user._id == req.params.id) {
         if (req.body.password) {
             try {
                 const salt = await bcrypt.genSalt(10);
@@ -36,7 +37,7 @@ module.exports.UpdateProfile = async (req, res, next) => {
     };
 };
 
-module.exports.GetUserProfile = async (req, res) => {
+module.exports.GetThisUserProfile = async (req, res) => {
     if(req.user) {
         return res.status(200).json({
             user: {
@@ -54,3 +55,96 @@ module.exports.GetUserProfile = async (req, res) => {
         success: false,
     });
 };
+
+module.exports.GetUserProfile = async (req, res) => {
+    if(req.params.id) {
+        const userData = await User.findById(req.params.id);
+        return res.status(200).json({
+            user: {
+                _id: userData._id,
+                username: userData.username,
+                email: userData.email,
+                profilePicture: userData.profilePicture,
+            },
+            success: true,
+        });
+    }
+    return res.status(500).json({
+        message: `Error!`,
+        success: false,
+    });
+};
+
+module.exports.GetFriends = async (req, res) => {
+    try {
+        const user = await User.findById(req.user._id);
+        const friends = await Promise.all(
+            user.friends.map((friendId) => {
+                return User.findById(friendId);
+            })
+        );
+        let friendList = [];
+        friends.map((friend) => {
+            const { _id, username, profilePicture } = friend;
+            friendList.push({ _id, username, profilePicture });
+        });
+        res.status(200).json({
+            success: true,
+            friendList
+        })
+    } catch (err) {
+        res.status(500).json(err);
+    }
+}
+
+module.exports.AddFriendUser = async (req, res) => {
+    if (req.user._id !== req.params.id) {
+        try {
+            const user = await User.findById(req.params.id);
+            const currentUser = await User.findById(req.user._id);
+            if (!user.friends.includes(req.user._id)) {
+                await user.updateOne({ $push: { friends: currentUser._id } });
+                await currentUser.updateOne({ $push: { friends: user._id } });
+                const newConversation = new Conversation({
+                    members: [currentUser._id, user._id],
+                });
+                await newConversation.save();   
+                res.status(200).json({
+                    "success": true,
+                    "message": "user has been added"
+                });
+            } else {
+                res.status(403).json({                    
+                    "success": false,
+                    "message": "you allready add this user"
+                });
+            }
+        } catch (err) {
+            res.status(500).json(err);
+        }
+    } else {
+        res.status(403).json("you cant follow yourself");
+    }
+};
+
+  //unfollow a user
+
+//   router.put("/:id/unfollow", async (req, res) => {
+//     if (req.body.userId !== req.params.id) {
+//       try {
+//         const user = await User.findById(req.params.id);
+//         const currentUser = await User.findById(req.body.userId);
+//         if (user.followers.includes(req.body.userId)) {
+//           await user.updateOne({ $pull: { followers: req.body.userId } });
+//           await currentUser.updateOne({ $pull: { followings: req.params.id } });
+//           res.status(200).json("user has been unfollowed");
+//         } else {
+//           res.status(403).json("you dont follow this user");
+//         }
+//       } catch (err) {
+//         res.status(500).json(err);
+//       }
+//     } else {
+//       res.status(403).json("you cant unfollow yourself");
+//     }
+//   });
