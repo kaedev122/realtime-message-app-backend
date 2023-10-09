@@ -75,6 +75,35 @@ module.exports.GetUserProfile = async (req, res) => {
     });
 };
 
+
+module.exports.GetUsersProfiles = async (req, res) => {
+    const { ids } = req.body;
+    if (ids && Array.isArray(ids) && ids.length > 0) {
+        try {
+            const usersData = await User.find({ _id: { $in: ids } });
+            const users = usersData.map(user => ({
+                _id: user._id,
+                username: user.username,
+                email: user.email,
+                profilePicture: user.profilePicture,
+            }));
+            return res.status(200).json({
+                users,
+                success: true,
+            });
+        } catch (error) {
+            return res.status(500).json({
+                message: `Error: ${error.message}`,
+                success: false,
+            });
+        }
+    }
+    return res.status(400).json({
+        message: `Invalid input. Please provide an array of user _ids.`,
+        success: false,
+    });
+};
+
 module.exports.GetFriends = async (req, res) => {
     try {
         const user = await User.findById(req.user._id);
