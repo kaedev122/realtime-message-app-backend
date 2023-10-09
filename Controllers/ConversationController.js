@@ -3,12 +3,11 @@ const Conversation = require("../Models/Conversation.js");
 const Promise = require('bluebird');
 
 module.exports.createConversation =  async (req, res) => {
-    const sender = await User.findById(req.body.senderId).select('_id username email profilePicture')
-    const receiver = await User.findById(req.body.receiverId).select('_id username email profilePicture')
+    const sender = mongoose.Types.ObjectId(req.body.senderId)
+    const receiver = mongoose.Types.ObjectId(req.body.receiverId)
     const newConversation = new Conversation({
         members: [sender, receiver],
     });
-    
     try {
         const savedConversation = await newConversation.save();
         res.status(200).json(savedConversation);
@@ -19,9 +18,8 @@ module.exports.createConversation =  async (req, res) => {
 
 module.exports.getAllConversation = async (req, res) => {
     try {
-        const user = await User.findById(req.user._id).select('_id username email profilePicture')
         const conversation = await Conversation.find({
-            members: { $in: [user] },
+            members: { $in: [req.user._id] },
         });
         res.status(200).json(conversation);
     } catch (err) {
