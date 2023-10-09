@@ -19,8 +19,9 @@ module.exports.createConversation =  async (req, res) => {
 module.exports.getAllConversation = async (req, res) => {
     try {
         const conversation = await Conversation.find({
-            members: { $in: [req.user._id] },
+            members: { $in: [req.user._id.toHexString()] },
         });
+        console.log(conversation)
         res.status(200).json(conversation);
     } catch (err) {
         res.status(500).json(err);
