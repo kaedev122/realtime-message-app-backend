@@ -75,7 +75,6 @@ module.exports.GetUserProfile = async (req, res) => {
     });
 };
 
-
 module.exports.GetUsersProfiles = async (req, res) => {
     const { ids } = req.body;
     if (ids && Array.isArray(ids) && ids.length > 0) {
@@ -104,75 +103,3 @@ module.exports.GetUsersProfiles = async (req, res) => {
     });
 };
 
-module.exports.GetFriends = async (req, res) => {
-    try {
-        const user = await User.findById(req.user._id);
-        const friends = await Promise.all(
-            user.friends.map((friendId) => {
-                return User.findById(friendId);
-            })
-        );
-        let friendList = [];
-        friends.map((friend) => {
-            const { _id, username, profilePicture } = friend;
-            friendList.push({ _id, username, profilePicture });
-        });
-        res.status(200).json({
-            success: true,
-            friendList
-        })
-    } catch (err) {
-        res.status(500).json(err);
-    }
-}
-
-module.exports.AddFriendUser = async (req, res) => {
-    if (req.user._id !== req.params.id) {
-        try {
-            const user = await User.findById(req.params.id);
-            const currentUser = await User.findById(req.user._id);
-            if (!user.friends.includes(req.user._id)) {
-                await user.updateOne({ $push: { friends: currentUser._id } });
-                await currentUser.updateOne({ $push: { friends: user._id } });
-                const newConversation = new Conversation({
-                    members: [currentUser._id, user._id],
-                });
-                await newConversation.save();   
-                res.status(200).json({
-                    "success": true,
-                    "message": "user has been added"
-                });
-            } else {
-                res.status(403).json({                    
-                    "success": false,
-                    "message": "you allready add this user"
-                });
-            }
-        } catch (err) {
-            res.status(500).json(err);
-        }
-    } else {
-        res.status(403).json("you cant follow yourself");
-    }
-};
-
-  //unfollow a user
-module.exports.UnfriendUser = async  (req, res) => {
-    if (req.user._id !== req.params.id) {
-        try {
-            const user = await User.findById(req.params.id);
-            const currentUser = await User.findById(req.user._id);
-            if (user.friends.includes(req.user._id)) {
-                await user.updateOne({ $pull: { friends: req.user._id } });
-                await currentUser.updateOne({ $pull: { friends: req.params.id } });
-                res.status(200).json("user has been unfriend");
-            } else {
-                res.status(403).json("you dont have friend with this user");
-            }
-        } catch (err) {
-            res.status(500).json(err);
-        }
-    } else {
-        res.status(403).json("you cant unfriend yourself");
-    }
-};
