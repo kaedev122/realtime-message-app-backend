@@ -8,6 +8,10 @@ const ConversationSchema = new mongoose.Schema(
     group: {
       type: Boolean,
       default: false,
+    },
+    groupPicture: {
+      type: String,
+      default: ''
     }
   },
   { timestamps: true }

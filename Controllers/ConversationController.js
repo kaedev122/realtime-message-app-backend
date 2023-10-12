@@ -16,6 +16,19 @@ module.exports.createConversation =  async (req, res) => {
     }
 };
 
+module.exports.createGroupConversation =  async (req, res) => {
+    const newConversation = new Conversation({
+        members: req.body.members,
+        group: true
+    });
+    try {
+        const savedConversation = await newConversation.save();
+        res.status(200).json(savedConversation);
+    } catch (err) {
+        res.status(500).json(err);
+    }
+};
+
 module.exports.getAllConversation = async (req, res) => {
     try {
         const conversation = await Conversation.find({
@@ -32,6 +45,8 @@ module.exports.getAllConversation = async (req, res) => {
             }));
             return {
                 _id: item._id,
+                group: item.group,
+                groupPicture: item.groupPicture,
                 createdAt: item.createdAt,
                 members: users
             }
