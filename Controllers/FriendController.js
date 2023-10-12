@@ -37,8 +37,8 @@ module.exports.UnfriendUser = async  (req, res) => {
             const user = await User.findById(req.params.id);
             const currentUser = await User.findById(req.user._id);
             if (user.friends.includes(req.user._id)) {
-                await user.updateOne({ $pull: { friends: req.user._id } });
-                await currentUser.updateOne({ $pull: { friends: req.params.id } });
+                await user.updateOne({ $pull: { friends: currentUser._id } });
+                await currentUser.updateOne({ $pull: { friends: user._id } });
                 res.status(200).json("user has been unfriend");
             } else {
                 res.status(403).json("you dont have friend with this user");
