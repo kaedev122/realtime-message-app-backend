@@ -17,8 +17,7 @@ module.exports.UploadAvatar = async (req, res) => {
 module.exports.UploadImage = async (req, res) => {
     const stream = await v2.uploader.upload_stream({
         folder: "demo",
-    },
-    (error, result) => {
+    }, (error, result) => {
         if (error) return console.error(error);
         res.status(200).json(result);
     });

@@ -1,6 +1,18 @@
 const User = require("../Models/User.js");
 const Conversation = require("../Models/Conversation.js");
 const bcrypt = require('bcrypt');
+const {v2} = require('cloudinary');
+const {createReadStream} = require('streamifier')
+
+function uploadToCloudinary(image) {
+    return new Promise((resolve, reject) => {
+        const stream = v2.uploader.upload_stream({folder: "avatar",}, (error, result) => {
+            if (error) return reject(error);
+            return resolve(result.url);
+        })
+        createReadStream(image).pipe(stream);
+    })
+}
 
 module.exports.UpdateProfile = async (req, res) => {
     if (req.user._id == req.params.id) {
@@ -16,6 +28,8 @@ module.exports.UpdateProfile = async (req, res) => {
             }
         }
         try {
+            req.body.profilePicture = await uploadToCloudinary(req.file.buffer);
+
             await User.findByIdAndUpdate(req.params.id, {
                 $set: req.body,
             });
