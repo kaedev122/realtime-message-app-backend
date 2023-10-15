@@ -12,13 +12,13 @@ const userRoute = require('./Routes/UserRoute');
 const chatRoute = require('./Routes/ChatRoute');
 const friendRoute = require('./Routes/FriendRoute');
 
-const { MONGO_URL, PORT } = process.env;
+const { MONGO_URL, PORT, CLOUD_NAME, API_KEY, API_SECRET } = process.env;
 const {v2} = require('cloudinary');
 
 v2.config({
-    cloud_name: process.env.CLOUD_NAME,
-    api_key: process.env.API_KEY,
-    api_secret: process.env.API_SECRET,
+    cloud_name: CLOUD_NAME,
+    api_key: API_KEY,
+    api_secret: API_SECRET,
 });
 
 mongoose
