@@ -13,7 +13,7 @@ function uploadToCloudinary(image) {
 }
 
 module.exports.createMessage = async (req, res) => {
-    if (req.file.buffer) {
+    if (req.file) {
         req.body.image = await uploadToCloudinary(req.file.buffer);
     }
     try {
