@@ -9,9 +9,12 @@ const ConversationSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    groupPicture: {
+    groupAvatar: {
       type: String,
       default: ''
+    },
+    groupName: {
+      type: String,
     }
   },
   { timestamps: true }

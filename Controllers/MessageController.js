@@ -1,8 +1,23 @@
 const Message = require("../Models/Message.js");
+const {v2} = require('cloudinary');
+const {createReadStream} = require('streamifier')
+
+function uploadToCloudinary(image) {
+    return new Promise((resolve, reject) => {
+        const stream = v2.uploader.upload_stream({folder: "image",}, (error, result) => {
+            if (error) return reject(error);
+            return resolve(result.url);
+        })
+        createReadStream(image).pipe(stream);
+    })
+}
 
 module.exports.createMessage = async (req, res) => {
-    const newMessage = new Message(req.body);
+    if (req.file.buffer) {
+        req.body.image = await uploadToCloudinary(req.file.buffer);
+    }
     try {
+        const newMessage = new Message(req.body);
         const savedMessage = await newMessage.save();
         res.status(200).json(savedMessage);
     } catch (err) {

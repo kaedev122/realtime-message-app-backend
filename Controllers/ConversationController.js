@@ -1,7 +1,18 @@
 const User = require("../Models/User.js");
 const Conversation = require("../Models/Conversation.js");
 const Promise = require('bluebird');
+const {v2} = require('cloudinary');
+const {createReadStream} = require('streamifier')
 
+function uploadToCloudinary(image) {
+    return new Promise((resolve, reject) => {
+        const stream = v2.uploader.upload_stream({folder: "groupAvatar",}, (error, result) => {
+            if (error) return reject(error);
+            return resolve(result.url);
+        })
+        createReadStream(image).pipe(stream);
+    })
+}
 module.exports.createConversation =  async (req, res) => {
     const sender = req.body.senderId
     const receiver = req.body.receiverId
@@ -24,6 +35,21 @@ module.exports.createGroupConversation =  async (req, res) => {
     try {
         const savedConversation = await newConversation.save();
         res.status(200).json(savedConversation);
+    } catch (err) {
+        res.status(500).json(err);
+    }
+};
+
+module.exports.updateGroupConversation =  async (req, res) => {
+    try {
+        req.body.groupAvatar = await uploadToCloudinary(req.file.buffer);
+        await Conversation.findByIdAndUpdate(req.params.conversationId, {
+            $set: req.body,
+        });
+        res.status(200).json({
+            message: 'Conversation has been updated',
+            success: true,
+        });
     } catch (err) {
         res.status(500).json(err);
     }
