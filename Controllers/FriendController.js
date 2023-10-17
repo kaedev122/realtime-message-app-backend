@@ -10,12 +10,12 @@ module.exports.AddFriendUser = async (req, res) => {
                 await user.updateOne({ $push: { friends: currentUser._id } });
                 await currentUser.updateOne({ $push: { friends: user._id } });
                 const conversation = await Conversation.findOne({
-                    members: {$all: [user._id, currentUser._id]},
+                    members: {$all: [user._id.toHexString(), currentUser._id.toHexString()]},
                     group: false
                 });
                 if (!conversation) {
                     const newConversation = new Conversation({
-                        members: [currentUser._id, user._id],
+                        members: [currentUser._id.toHexString(), user._id.toHexString()],
                     });
                     await newConversation.save();   
                 }

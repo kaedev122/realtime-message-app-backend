@@ -60,7 +60,6 @@ module.exports.getAllConversation = async (req, res) => {
         const conversation = await Conversation.find({
             members: { $in: [req.user._id.toHexString()] },
         });
-        
         const result = await Promise.map(conversation, async (item) => {
             const usersData = await User.find({ _id: { $in: item.members } });
             const users = usersData.map(user => ({
