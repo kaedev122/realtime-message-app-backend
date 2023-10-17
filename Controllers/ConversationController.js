@@ -89,10 +89,12 @@ module.exports.getOneConversation = async (req, res) => {
         const secondUserId = req.params.secondUserId
         const conversation = await Conversation.findOne({
             members: [firstUserId, secondUserId],
+            group: false
         });
         if (!conversation) {
             const result = await Conversation.findOne({
                 members: [secondUserId, firstUserId],
+                group: false
             });
             return res.status(200).json(result)
         }
