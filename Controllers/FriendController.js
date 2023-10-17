@@ -9,10 +9,16 @@ module.exports.AddFriendUser = async (req, res) => {
             if (!user.friends.includes(req.user._id)) {
                 await user.updateOne({ $push: { friends: currentUser._id } });
                 await currentUser.updateOne({ $push: { friends: user._id } });
-                const newConversation = new Conversation({
-                    members: [currentUser._id, user._id],
+                const conversation = await Conversation.findOne({
+                    members: {$all: [user._id, currentUser._id]},
+                    group: false
                 });
-                await newConversation.save();   
+                if (!conversation) {
+                    const newConversation = new Conversation({
+                        members: [currentUser._id, user._id],
+                    });
+                    await newConversation.save();   
+                }
                 res.status(200).json({
                     "success": true,
                     "message": "user has been added"
@@ -20,7 +26,7 @@ module.exports.AddFriendUser = async (req, res) => {
             } else {
                 res.status(403).json({                    
                     "success": false,
-                    "message": "you allready add this user"
+                    "message": "you already add this user"
                 });
             }
         } catch (err) {
