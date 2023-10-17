@@ -88,7 +88,7 @@ module.exports.getOneConversation = async (req, res) => {
         const firstUserId = req.params.firstUserId
         const secondUserId = req.params.secondUserId
         const conversation = await Conversation.findOne({
-            members: { $all: [firstUserId, secondUserId] },
+            members: [firstUserId, secondUserId],
         });
         res.status(200).json(conversation)
     } catch (err) {
