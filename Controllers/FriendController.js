@@ -106,7 +106,7 @@ module.exports.GetRandomUser = async (req, res) => {
 module.exports.FindUserByUsername = async (req, res) => {
     try {
         const usersData = await User.find({
-            username: { $regex: req.body.username }
+            username: { $regex: req.query.username }
         })
         const result = usersData.map(user => {
             return {
