@@ -107,11 +107,16 @@ module.exports.FindUserByUsername = async (req, res) => {
     try {
         const usersData = await User.find({
             username: { $regex: req.body.username }
-        }).select("_id username email profilePicture")
-        
-        res.status(200).json({
-            usersData
         })
+        const result = usersData.map(user => {
+            return {
+                _id: user._id,
+                username: user.username,
+                email: user.email,
+                profilePicture: user.profilePicture
+            }
+        })
+        res.status(200).json(result)
     } catch (err) {
         res.status(500).json(err);
     }

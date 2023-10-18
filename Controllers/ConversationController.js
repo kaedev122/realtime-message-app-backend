@@ -71,7 +71,8 @@ module.exports.getAllConversation = async (req, res) => {
             return {
                 _id: item._id,
                 group: item.group,
-                groupPicture: item.groupPicture,
+                groupAvatar: item.groupAvatar,
+                groupName: item.groupName,
                 createdAt: item.createdAt,
                 members: users
             }
