@@ -27,7 +27,7 @@ module.exports = async function connectSocket(http) {
             io.emit("getUsers", users)
         })
 
-        socket.on("sendMessage", ({ _id, conversationId, createdAt, image, sender, members }) => {
+        socket.on("sendMessage", ({ _id, conversationId, createdAt, image, text, sender, members }) => {
             console.log("members", members)
             
             const mems = members.map(member => {
@@ -48,6 +48,7 @@ module.exports = async function connectSocket(http) {
                 conversationId: conversationId,
                 createdAt: createdAt,
                 image: image,
+                text: text,
                 sender: sender
             });
 
