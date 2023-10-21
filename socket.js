@@ -28,25 +28,29 @@ module.exports = async function connectSocket(http) {
         })
 
         socket.on("sendMessage", ({ _id, conversationId, createdAt, image, sender, members }) => {
+            console.log("members", members)
+            
             const mems = members.map(member => {
                 return member._id
             })
+
+            console.log("mems", mems)
+
             const usersGetMessage = mems.map(mem => {
-                console.log("mem", mem)
                 const memSocket = getUser(mem)
-                console.log("memSocket", memSocket)
                 return memSocket?.socketId
             });
 
-            for (let userGetMessage of usersGetMessage) {
-                io.to(userGetMessage).emit("getMessage", {
-                    _id: _id,
-                    conversationId: conversationId,
-                    createdAt: createdAt,
-                    image: image,
-                    sender: sender
-                });
-            }
+            console.log("usersGetMessage", usersGetMessage)
+
+            io.to(usersGetMessage).emit("getMessage", {
+                _id: _id,
+                conversationId: conversationId,
+                createdAt: createdAt,
+                image: image,
+                sender: sender
+            });
+
         });
 
         socket.on("disconnect", () => {
