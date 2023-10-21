@@ -43,7 +43,7 @@ module.exports = async function connectSocket(http) {
 
             console.log("usersGetMessage", usersGetMessage)
 
-            io.to(usersGetMessage).emit("getMessage", {
+            socket.emit("getMessage", {
                 _id: _id,
                 conversationId: conversationId,
                 createdAt: createdAt,
