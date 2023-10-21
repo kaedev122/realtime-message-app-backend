@@ -34,7 +34,8 @@ module.exports = async function connectSocket(http) {
             const usersGetMessage = mems.map(mem => {
                 console.log("mem", mem)
                 const memSocket = getUser(mem)
-                return memSocket.socketId
+                console.log("memSocket", memSocket)
+                return memSocket?.socketId
             });
 
             io.to(usersGetMessage).emit("getMessage", {
