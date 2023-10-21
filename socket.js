@@ -38,13 +38,15 @@ module.exports = async function connectSocket(http) {
                 return memSocket?.socketId
             });
 
-            io.to(usersGetMessage).emit("getMessage", {
-                _id: _id,
-                conversationId: conversationId,
-                createdAt: createdAt,
-                image: image,
-                sender: sender
-            });
+            for (let userGetMessage of usersGetMessage) {
+                io.to(userGetMessage).emit("getMessage", {
+                    _id: _id,
+                    conversationId: conversationId,
+                    createdAt: createdAt,
+                    image: image,
+                    sender: sender
+                });
+            }
         });
 
         socket.on("disconnect", () => {
