@@ -33,7 +33,7 @@ module.exports = async function connectSocket(http) {
             })
             const usersGetMessage = mems.map(mem => {
                 console.log("mem", mem)
-                memSocket = getUser(mem)
+                const memSocket = getUser(mem)
                 return memSocket.socketId
             });
 
