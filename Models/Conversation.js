@@ -18,6 +18,10 @@ const ConversationSchema = new mongoose.Schema(
     },
     watched: {
       type: Array,
+    },
+    lastestMessage: {
+      type: mongoose.Schema.Types.ObjectId, 
+      ref: 'Message',
     }
   },
   { timestamps: true }

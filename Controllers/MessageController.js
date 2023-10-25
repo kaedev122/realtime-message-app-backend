@@ -20,8 +20,9 @@ module.exports.createMessage = async (req, res) => {
     try {
         const newMessage = new Message(req.body);
         const savedMessage = await newMessage.save();
-        const conversation = await Conversation.findByIdAndUpdate(req.body.conversationId, {
-            watched: [req.user._id]
+        await Conversation.findByIdAndUpdate(req.body.conversationId, {
+            watched: [req.user._id],
+            lastestMessage: savedMessage
         })
         res.status(200).json(savedMessage);
     } catch (err) {

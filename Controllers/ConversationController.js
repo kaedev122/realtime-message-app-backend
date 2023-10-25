@@ -1,4 +1,5 @@
 const User = require("../Models/User.js");
+const Message = require("../Models/Message.js");
 const Conversation = require("../Models/Conversation.js");
 const Promise = require('bluebird');
 const {v2} = require('cloudinary');
@@ -68,6 +69,8 @@ module.exports.getAllConversation = async (req, res) => {
                 email: user.email,
                 profilePicture: user.profilePicture,
             }));
+            const message = await Message.findOne(item.lastestMessage).select("-__v -updatedAt")
+            message.sender = await User.findOne(message.sender).select("username")
             return {
                 _id: item._id,
                 group: item.group,
@@ -75,7 +78,8 @@ module.exports.getAllConversation = async (req, res) => {
                 groupName: item.groupName,
                 createdAt: item.createdAt,
                 members: users,
-                watched: item.watched
+                watched: item.watched,
+                lastestMessage: message
             }
         })
         res.status(200).json(result);
