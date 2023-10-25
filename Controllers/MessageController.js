@@ -1,4 +1,5 @@
 const Message = require("../Models/Message.js");
+const Conversation = require("../Models/Conversation.js");
 const {v2} = require('cloudinary');
 const {createReadStream} = require('streamifier')
 
@@ -19,6 +20,9 @@ module.exports.createMessage = async (req, res) => {
     try {
         const newMessage = new Message(req.body);
         const savedMessage = await newMessage.save();
+        const conversation = await Conversation.findByIdAndUpdate(req.body.conversationId, {
+            watched: [req.user._id]
+        })
         res.status(200).json(savedMessage);
     } catch (err) {
         res.status(500).json(err);

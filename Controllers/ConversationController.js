@@ -74,7 +74,8 @@ module.exports.getAllConversation = async (req, res) => {
                 groupAvatar: item.groupAvatar,
                 groupName: item.groupName,
                 createdAt: item.createdAt,
-                members: users
+                members: users,
+                watched: item.watched
             }
         })
         res.status(200).json(result);
@@ -96,3 +97,14 @@ module.exports.getOneConversation = async (req, res) => {
         res.status(500).json(err);
     }
 };
+
+module.exports.updateUserWatched = async (req, res) => {
+    try {
+        const conversation = await Conversation.findByIdAndUpdate(req.params.conversationId, {
+            $addToSet: {watched: {$each: [req.user._id]}}
+        })
+        res.status(200).json(conversation)
+    } catch (err) {
+        res.status(500).json(err);
+    }
+}

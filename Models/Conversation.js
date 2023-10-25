@@ -15,6 +15,9 @@ const ConversationSchema = new mongoose.Schema(
     },
     groupName: {
       type: String,
+    },
+    watched: {
+      type: Array,
     }
   },
   { timestamps: true }
