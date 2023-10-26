@@ -71,6 +71,7 @@ module.exports.getAllConversation = async (req, res) => {
             }));
             const message = await Message.findOne(item.lastestMessage).select("-__v -updatedAt")
             message.sender = await User.findOne(message.sender).select("username")
+            
             return {
                 _id: item._id,
                 group: item.group,
