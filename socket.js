@@ -31,7 +31,7 @@ module.exports = async function connectSocket(http) {
     const getAllConversationOfUser = async (userId) => {
         try {
             const conversation = await Conversation.find({
-                members: { $in: [userId] },
+                members: { $in: [userId.toString()] },
             });
             const result = conversation.map(item => {
                 return item._id
@@ -52,6 +52,7 @@ module.exports = async function connectSocket(http) {
 
         const userId = await getUserIdBySocket(socket)
         let conversationList = await getAllConversationOfUser(userId)
+        console.log(userId)
         console.log(conversationList)
         // socket.on("sendMessage", ({ _id, conversationId, createdAt, image, text, sender, members }) => {
         //     io.emit("getMessage", {
