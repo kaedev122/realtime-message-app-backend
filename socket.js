@@ -53,26 +53,25 @@ module.exports = async function connectSocket(http) {
             io.emit("getUsersOnline", getAllUserIdOnline())
             let conversationList = await getAllConversationOfUser(userId)
             conversationList.map(conversationId => {
+                console.log(`room-${conversationId}`)
                 socket.join(`room-${conversationId}`)
             })
         })
 
-        
-        socket.join
-
         // const userId = await getUserIdBySocket(socket)
 
-        // socket.on("sendMessage", ({ _id, conversationId, createdAt, image, text, sender, members }) => {
-        //     io.emit("getMessage", {
-        //         _id: _id,
-        //         conversationId: conversationId,
-        //         createdAt: createdAt,
-        //         image: image,
-        //         text: text,
-        //         sender: sender
-        //     });
-        //     console.log(sender)
-        // });
+        socket.on("sendMessage", ({ _id, conversationId, createdAt, image, text, sender, members }) => {
+            console.log("conversationId", conversationId)
+            io.emit("getMessage", {
+                _id: _id,
+                conversationId: conversationId,
+                createdAt: createdAt,
+                image: image,
+                text: text,
+                sender: sender
+            });
+            console.log(sender)
+        });
 
         socket.on('forceDisconnect', () => {
             socket.disconnect();
