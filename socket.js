@@ -1,3 +1,8 @@
+const User = require("./Models/User.js");
+const Message = require("./Models/Message.js");
+const Conversation = require("./Models/Conversation.js");
+const Promise = require('bluebird');
+
 module.exports = async function connectSocket(http) {
     const io = require('socket.io')(http, {
         cors: {
@@ -18,26 +23,47 @@ module.exports = async function connectSocket(http) {
     const getUser = (userId) => {
         return users.find((user) => user.userId === userId);
     };
+
+    const getUserIdBySocket = (socketId) => {
+        return users.find((user) => user.socketId === socketId);
+    };
+
+    module.exports.getAllConversationOfUser = async (userId) => {
+        try {
+            const conversation = await Conversation.find({
+                members: { $in: [userId] },
+            });
+            const result = conversation.map(item => {
+                return item._id
+            })
+            return result;
+        } catch (err) {
+            console.log(err);
+        }
+    }
     
-    io.on("connection", (socket) => {
+    io.on("connection", async (socket) => {
         console.log(`⚡: ${socket.id} user just connected!`);
 
         socket.on("addUser", userId => {
             addUser(userId, socket.id)
-            io.emit("getUsers", users)
+            io.emit("getUsersOnline", users.userId)
         })
 
-        socket.on("sendMessage", ({ _id, conversationId, createdAt, image, text, sender, members }) => {
-            io.emit("getMessage", {
-                _id: _id,
-                conversationId: conversationId,
-                createdAt: createdAt,
-                image: image,
-                text: text,
-                sender: sender
-            });
-            console.log(sender)
-        });
+        const userId = await getUserIdBySocket(socket)
+        let conversationList = await getAllConversationOfUser(userId)
+        console.log(conversationList)
+        // socket.on("sendMessage", ({ _id, conversationId, createdAt, image, text, sender, members }) => {
+        //     io.emit("getMessage", {
+        //         _id: _id,
+        //         conversationId: conversationId,
+        //         createdAt: createdAt,
+        //         image: image,
+        //         text: text,
+        //         sender: sender
+        //     });
+        //     console.log(sender)
+        // });
 
         socket.on("disconnect", () => {
             console.log(`❌: ${socket.id} user just disconnected!`)
