@@ -24,9 +24,12 @@ module.exports = async function connectSocket(http) {
         return users.find((user) => user.userId === userId);
     };
 
-    const getUserIdBySocket = (socketId) => {
-        return users.find((user) => user.socketId === socketId);
-    };
+    const getAllUserIdOnline = () => {
+        const result = users.map(user => {
+            return user.userId
+        })
+        return result
+    }
 
     const getAllConversationOfUser = async (userId) => {
         try {
@@ -47,9 +50,8 @@ module.exports = async function connectSocket(http) {
 
         socket.on("addUser", async userId => {
             addUser(userId, socket.id)
-            io.emit("getUsersOnline", users.userId)
+            io.emit("getUsersOnline", getAllUserIdOnline())
             let conversationList = await getAllConversationOfUser(userId)
-            console.log(userId)
             console.log(conversationList)
         })
 
