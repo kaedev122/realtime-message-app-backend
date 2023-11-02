@@ -52,7 +52,9 @@ module.exports = async function connectSocket(http) {
             addUser(userId, socket.id)
             io.emit("getUsersOnline", getAllUserIdOnline())
             let conversationList = await getAllConversationOfUser(userId)
-            conversationList.map()
+            conversationList.map(conversationId => {
+                socket.join(`room-${conversationId}`)
+            })
         })
 
         
