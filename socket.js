@@ -36,9 +36,6 @@ module.exports = async function connectSocket(http) {
             const conversation = await Conversation.find({
                 members: { $in: [userId.toString()] },
             }).select("_id");
-            // const result = conversation.map(item => {
-            //     return item._id
-            // })
             return conversation;
         } catch (err) {
             console.log(err);
@@ -53,16 +50,12 @@ module.exports = async function connectSocket(http) {
             io.emit("getUsersOnline", getAllUserIdOnline())
             let conversationList = await getAllConversationOfUser(userId)
             conversationList.map(conversationId => {
-                console.log(`room-${conversationId._id}`)
                 socket.join(`room-${conversationId._id}`)
             })
         })
 
-        // const userId = await getUserIdBySocket(socket)
-
         socket.on("sendMessage", ({ _id, conversationId, createdAt, image, text, sender, members }) => {
-            console.log("conversationId", conversationId)
-            io.emit("getMessage", {
+            io.to(`room-${conversationId}`).emit("getMessage", {
                 _id: _id,
                 conversationId: conversationId,
                 createdAt: createdAt,
@@ -70,7 +63,6 @@ module.exports = async function connectSocket(http) {
                 text: text,
                 sender: sender
             });
-            console.log(sender)
         });
 
         socket.on('forceDisconnect', () => {
