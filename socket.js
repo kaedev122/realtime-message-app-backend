@@ -55,7 +55,6 @@ module.exports = async function connectSocket(http) {
             console.log(conversationList)
         })
 
-
         // const userId = await getUserIdBySocket(socket)
 
         // socket.on("sendMessage", ({ _id, conversationId, createdAt, image, text, sender, members }) => {
@@ -74,13 +73,13 @@ module.exports = async function connectSocket(http) {
             socket.disconnect();
             console.log(`❌: ${socket.id} user just disconnected!`)
             removeUser(socket.id)
-            io.emit("getUsers", users)
+            io.emit("getUsersOnline", users)
         });
 
         socket.on("disconnect", () => {
             console.log(`❌: ${socket.id} user just disconnected!`)
             removeUser(socket.id)
-            io.emit("getUsers", users)
+            io.emit("getUsersOnline", users)
         })
     });
 };
