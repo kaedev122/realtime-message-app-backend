@@ -28,7 +28,7 @@ module.exports = async function connectSocket(http) {
         return users.find((user) => user.socketId === socketId);
     };
 
-    module.exports.getAllConversationOfUser = async (userId) => {
+    const getAllConversationOfUser = async (userId) => {
         try {
             const conversation = await Conversation.find({
                 members: { $in: [userId] },
