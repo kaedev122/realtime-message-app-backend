@@ -69,19 +69,32 @@ module.exports.getAllConversation = async (req, res) => {
                 email: user.email,
                 profilePicture: user.profilePicture,
             }));
-            const message = await Message.findOne(item.lastestMessage).select("-__v -updatedAt")
-            message.sender = await User.findOne(message.sender).select("username")
-            
-            return {
-                _id: item._id,
-                group: item.group,
-                groupAvatar: item.groupAvatar,
-                groupName: item.groupName,
-                createdAt: item.createdAt,
-                members: users,
-                watched: item.watched,
-                lastestMessage: message
+            if (item.lastestMessage) {
+                const message = await Message.findOne(item.lastestMessage).select("-__v -updatedAt")
+                message.sender = await User.findOne(message.sender).select("username")
+                return {
+                    _id: item._id,
+                    group: item.group,
+                    groupAvatar: item.groupAvatar,
+                    groupName: item.groupName,
+                    createdAt: item.createdAt,
+                    members: users,
+                    watched: item.watched,
+                    lastestMessage: message
+                }
             }
+            else {
+                return {
+                    _id: item._id,
+                    group: item.group,
+                    groupAvatar: item.groupAvatar,
+                    groupName: item.groupName,
+                    createdAt: item.createdAt,
+                    members: users,
+                    watched: item.watched,
+                }
+            }
+
         })
         res.status(200).json(result);
     } catch (err) {
