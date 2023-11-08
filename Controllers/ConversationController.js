@@ -62,39 +62,35 @@ module.exports.getAllConversation = async (req, res) => {
             members: { $in: [req.user._id.toHexString()] },
         });
         const result = await Promise.map(conversation, async (item) => {
-            const usersData = await User.find({ _id: { $in: item.members } });
-            const users = usersData.map(user => ({
+            let usersData = await User.find({ _id: { $in: item.members } });
+            item.members = usersData.map(user => ({
                 _id: user._id,
                 username: user.username,
                 email: user.email,
                 profilePicture: user.profilePicture,
             }));
             if (item.lastestMessage) {
-                const message = await Message.findOne(item.lastestMessage).select("-__v -updatedAt")
+                let message = await Message.findOne(item.lastestMessage).select("-__v -updatedAt")
                 message.sender = await User.findOne(message.sender).select("username")
-                return {
-                    _id: item._id,
-                    group: item.group,
-                    groupAvatar: item.groupAvatar,
-                    groupName: item.groupName,
-                    createdAt: item.createdAt,
-                    members: users,
-                    watched: item.watched,
-                    lastestMessage: message
-                }
+                item.lastestMessage = message
             }
-            else {
-                return {
-                    _id: item._id,
-                    group: item.group,
-                    groupAvatar: item.groupAvatar,
-                    groupName: item.groupName,
-                    createdAt: item.createdAt,
-                    members: users,
-                    watched: item.watched,
-                }
+            if (item.watched) {
+                const watched = await Promise.map(item.watched, async (watcher) => {
+                    let result = User.findOne(watcher).select("_id username profilePicture")
+                    return result
+                })
+                item.watched = watched
             }
-
+            return {
+                _id: item._id,
+                group: item.group,
+                groupAvatar: item.groupAvatar,
+                groupName: item.groupName,
+                createdAt: item.createdAt,
+                members: item.members,
+                watched: item.watched,
+                lastestMessage: item.lastestMessage
+            }
         })
         res.status(200).json(result);
     } catch (err) {
@@ -106,11 +102,38 @@ module.exports.getOneConversation = async (req, res) => {
     try {
         const firstUserId = req.params.firstUserId
         const secondUserId = req.params.secondUserId
-        const conversation = await Conversation.findOne({
+        const item = await Conversation.findOne({
             members: {$all: [firstUserId, secondUserId]},
             group: false
         });
-        return res.status(200).json(conversation)
+        let usersData = await User.find({ _id: { $in: item.members } });
+        item.members = usersData.map(user => ({
+            _id: user._id,
+            username: user.username,
+            email: user.email,
+            profilePicture: user.profilePicture,
+        }));
+        if (item.lastestMessage) {
+            let message = await Message.findOne(item.lastestMessage).select("-__v -updatedAt")
+            message.sender = await User.findOne(message.sender).select("username")
+            item.lastestMessage = message
+        }
+        if (item.watched) {
+            const watched = await Promise.map(item.watched, async (watcher) => {
+                let result = User.findOne(watcher).select("_id username profilePicture")
+                return result
+            })
+            item.watched = watched
+        }
+        const result = {
+            _id: item._id,
+            group: item.group,
+            createdAt: item.createdAt,
+            members: item.members,
+            watched: item.watched,
+            lastestMessage: item.lastestMessage
+        }
+        res.status(200).json(result);
     } catch (err) {
         res.status(500).json(err);
     }
