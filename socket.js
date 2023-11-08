@@ -55,24 +55,27 @@ module.exports = async function connectSocket(http) {
         })
 
         socket.on("sendMessage", ({ _id, conversationId, createdAt, image, text, sender, members }) => {
-            io.to(`room-${conversationId}`).emit("getMessage", {
+            let message = {
                 _id: _id,
                 conversationId: conversationId,
                 createdAt: createdAt,
                 image: image,
                 text: text,
                 sender: sender
-            });
+            }
+            io.to(`room-${conversationId}`).emit("getMessage", message);
 
             let allReceiverSocket = members.map(member => { 
                 let user = getUser(member._id)
-                console.log("--------------------user-----------------------", user)
                 if (user) return user.socketId
                 return
             });
 
             allReceiverSocket.forEach(receiver => {
-                console.log("--------------------receiver-----------------------", receiver)
+                socket.broadcast.to(receiver).emit('getIncomeConversation', {
+                    _id: conversationId,
+                    lastestMessage: message
+                });
             });
         });
 
