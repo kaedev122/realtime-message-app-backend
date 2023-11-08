@@ -21,7 +21,7 @@ module.exports = async function connectSocket(http) {
     }
 
     const getUser = (userId) => {
-        return users.find((user) => user.userId === userId);
+        return users.find((user) => user.userId == userId);
     };
 
     const getAllUserIdOnline = () => {
@@ -66,7 +66,9 @@ module.exports = async function connectSocket(http) {
 
             let allReceiverSocket = members.map(member => { 
                 let user = getUser(member._id)
-                return user.socketId
+                console.log("--------------------user-----------------------", user)
+                if (user) return user.socketId
+                return
             });
 
             allReceiverSocket.forEach(receiver => {
