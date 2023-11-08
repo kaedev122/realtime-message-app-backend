@@ -61,7 +61,8 @@ module.exports = async function connectSocket(http) {
                 createdAt: createdAt,
                 image: image,
                 text: text,
-                sender: sender
+                sender: sender,
+                watched: []
             }
             io.to(`room-${conversationId}`).emit("getMessage", message);
 
