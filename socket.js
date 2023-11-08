@@ -63,6 +63,15 @@ module.exports = async function connectSocket(http) {
                 text: text,
                 sender: sender
             });
+
+            let allReceiverSocket = members.map(member => { 
+                let user = getUser(member._id)
+                return user.socketId
+            });
+
+            allReceiverSocket.forEach(receiver => {
+                console.log(receiverher)
+            });
         });
 
         socket.on('forceDisconnect', () => {
