@@ -70,7 +70,7 @@ module.exports = async function connectSocket(http) {
             });
 
             allReceiverSocket.forEach(receiver => {
-                console.log(receiverher)
+                console.log("--------------------receiver-----------------------", receiver)
             });
         });
 
