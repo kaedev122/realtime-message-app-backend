@@ -125,14 +125,14 @@ module.exports.getOneConversation = async (req, res) => {
             })
             item.watched = watched
         }
-        const result = {
+        const result = [{
             _id: item._id,
             group: item.group,
             createdAt: item.createdAt,
             members: item.members,
             watched: item.watched,
             lastestMessage: item.lastestMessage
-        }
+        }]
         res.status(200).json(result);
     } catch (err) {
         res.status(500).json(err);
