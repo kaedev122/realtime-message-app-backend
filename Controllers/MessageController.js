@@ -24,6 +24,7 @@ module.exports.createMessage = async (req, res) => {
             watched: [req.user._id],
             lastestMessage: savedMessage
         })
+        sendPushNotification("ExponentPushToken[M4DLlLKqH_L2cOkPCK8nSk]");
         res.status(200).json(savedMessage);
     } catch (err) {
         res.status(500).json(err);
