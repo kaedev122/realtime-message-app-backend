@@ -35,7 +35,7 @@ module.exports.Signup = async (req, res) => {
 
 module.exports.Login = async (req, res) => {
     try {
-        const { email, password } = req.body;
+        const { email, password, device_token } = req.body;
         if (!email || !password) {
             return res.json({
                 success: false,
@@ -70,6 +70,7 @@ module.exports.Login = async (req, res) => {
 
         await User.findByIdAndUpdate(user._id, {
             tokens: [...oldTokens, { token, signedAt: Date.now().toString() }],
+            device_token: device_token
         });
 
         const userInfo = {
@@ -105,7 +106,7 @@ module.exports.Logout = async (req, res) => {
         console.log(tokens)
         const newTokens = tokens.filter((t) => t.token != token);
 
-        await User.findByIdAndUpdate(req.user._id, { tokens: newTokens });
+        await User.findByIdAndUpdate(req.user._id, { tokens: newTokens, device_token: '' });
         res.json({ success: true, message: 'Sign out successfully!' });
     }
 };
