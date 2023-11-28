@@ -149,3 +149,17 @@ module.exports.updateUserWatched = async (req, res) => {
         res.status(500).json(err);
     }
 }
+
+module.exports.addMemberGroup = async (req, res) => {
+    try {
+        const newMembers = req.body.members
+        const id = req.params.conversationId
+
+        const conversation = await Conversation.findByIdAndUpdate(id, {
+            $addToSet: {members: {$each: newMembers}}
+        })
+        res.status(200).json(conversation)
+    } catch (err) {
+        res.status(500).json(err);
+    }
+}
