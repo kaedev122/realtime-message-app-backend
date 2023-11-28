@@ -62,7 +62,7 @@ module.exports.Login = async (req, res) => {
         if (oldTokens.length) {
             oldTokens = oldTokens.filter((t) => {
                 const timeDiff = (Date.now() - parseInt(t.signedAt)) / 1000;
-                if (timeDiff < 86400) {
+                if (timeDiff < 2592000) {
                     return t;
                 }
             });
